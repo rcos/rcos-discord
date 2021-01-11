@@ -24,6 +24,7 @@
     <div class="field">
         <label class="rpi-label" for="timezone">Timezone</label>
         <select name="timezone" id="timezone" class="rpi-input" required>
+            <option value="America/New_York">America/New_York</option>
             {% for tz in timezones %}
             <option value="{{ tz }}" {% if tz==user['timezone'] %}selected{% endif %}>{{ tz }}</option>
             {% endfor %}

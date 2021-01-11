@@ -31,11 +31,7 @@ def before_request():
     '''Runs before every request.'''
     # Everything added to g can be accessed during the request
     if 'user' not in session and cas.username:
-        user = fetch_user(cas.username.lower())
-        if user:
-            session['user'] = user
-        else:
-            raise HTTPException("waaa")
+        session['user'] = fetch_user(cas.username.lower())
 
     if ('user_discord_account' not in session or session['user_discord_account'] is None) and cas.username:
         session['user_discord_account'] = fetch_user_discord_account(cas.username.lower())
