@@ -7,6 +7,9 @@
         <label class="rpi-label" for="first-name">First Name</label>
         <input class="rpi-input" value="{{ user['first_name'] }}" type="text" name="first_name" id="first-name"
             placeholder="Your given name or nickname" maxlength="20" required>
+    </div>
+
+    <div class="field">
         <label class="rpi-label" for="last-name">Last Name</label>
         <input class="rpi-input" value="{{ user['last_name'] }}" type="text" name="last_name" id="last-name"
             placeholder="Your family name" required>
@@ -16,6 +19,15 @@
         <label class="rpi-label" for="grad-year">Graduation Year</label>
         <input class="rpi-input" value="{{ user['graduation_year'] }}" type="number" name="graduation_year"
             id="grad-year" min="2000" max="2030" placeholder="What year will you graduate?" required>
+    </div>
+
+    <div class="field">
+        <label class="rpi-label" for="timezone">Timezone</label>
+        <select name="timezone" id="timezone" class="rpi-input" required>
+            {% for tz in timezones %}
+            <option value="{{ tz }}" {% if tz==user['timezone'] %}selected{% endif %}>{{ tz }}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <p>

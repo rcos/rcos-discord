@@ -4,11 +4,12 @@ Only a small subset of API endpoints are accounted for here.
 Based on the Discord API Documentation https://discord.com/developers/docs/intro
 '''
 
-from http.client import responses
 import os
 from typing import Dict
+
 import requests
 from dotenv import load_dotenv
+
 load_dotenv()
 
 API_BASE = 'https://discordapp.com/api'
@@ -38,15 +39,16 @@ def get_tokens(code):
 
     Discord docs: https://discord.com/developers/docs/topics/oauth2
     '''
+    data = {
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': REDIRECT_URI,
+            'scope': 'identity guilds.join'
+        }
     response = requests.post(f'{API_BASE}/oauth2/token',
-                             data={
-                                 'client_id': CLIENT_ID,
-                                 'client_secret': CLIENT_SECRET,
-                                 'grant_type': 'authorization_code',
-                                 'code': code,
-                                 'redirect_uri': REDIRECT_URI,
-                                 'scope': 'identity guilds.join'
-                             },
+                             data=data,
                              headers={
                                  'Content-Type': 'application/x-www-form-urlencoded'
                              }
