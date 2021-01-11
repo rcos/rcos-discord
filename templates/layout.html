@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>{{ config['SITE_TITLE'] }}</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <!-- Frank Matranga's RPI CSS classes -->
+    <link rel="stylesheet" href="https://apexal.github.io/rpi-css/rpi.css">
+</head>
+
+<body>
+    <header class="rpi-navbar">
+        <span class="navbar-brand">{{ config['SITE_TITLE'] }}</span>
+    </header>
+    <main class="rpi-card">
+        {% if alert %}
+        <div class="rpi-alert">{{ alert }}</div>
+        {% endif %}
+        {% block content %}{% endblock %}
+
+        <details>
+            <summary class="rpi-h2">What is this site?</summary>
+            This is not an official RPI service. It is an open-source webapp developed by students. The source code is
+            freely
+            available
+            on <a href="https://github.com/Apexal/discord-cas" target="_blank">GitHub</a>. Please report issues or
+            request features there!
+        </details>
+    </main>
+</body>
+
+</html>
