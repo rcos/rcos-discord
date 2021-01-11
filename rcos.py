@@ -16,7 +16,6 @@ def upser_user(username: str, user: Dict) -> Optional[Dict]:
         'is_rpi': True,
         'is_faculty': False
     }, headers=headers)
-    print(r.json())
     try:
         r.raise_for_status()
     except HTTPError as err:

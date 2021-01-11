@@ -40,13 +40,14 @@ def get_tokens(code):
     Discord docs: https://discord.com/developers/docs/topics/oauth2
     '''
     data = {
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
-            'grant_type': 'authorization_code',
-            'code': code,
-            'redirect_uri': REDIRECT_URI,
-            'scope': 'identity guilds.join'
-        }
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': REDIRECT_URI,
+        'scope': 'identity guilds.join'
+    }
+    print(data)
     response = requests.post(f'{API_BASE}/oauth2/token',
                              data=data,
                              headers={
