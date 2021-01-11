@@ -22,17 +22,19 @@ app = Flask(__name__)
 cas = CAS(app, '/cas')
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
-app.config['SITE_TITLE'] = os.environ.get('SITE_TITLE')
+app.config['SITE_TITLE'] = 'RCOS Discord'
 app.config['CAS_SERVER'] = 'https://cas-auth.rpi.edu/cas'
 app.config['CAS_AFTER_LOGIN'] = 'index'
 
 @app.before_request
 def before_request():
     '''Runs before every request.'''
-    # Everything added to g can be accessed during the request
+
+    # Try to fetch user
     if 'user' not in session and cas.username:
         session['user'] = fetch_user(cas.username.lower())
 
+    # Try to fetch user's discord account
     if ('user_discord_account' not in session or session['user_discord_account'] is None) and cas.username:
         session['user_discord_account'] = fetch_user_discord_account(cas.username.lower())
 
@@ -41,6 +43,8 @@ def before_request():
 def index():
     if request.method == 'GET':
         app.logger.info(f'Home page requested by {cas.username}')
+
+        # Already connected to Discord!
         if session['user_discord_account']:
             return redirect(url_for('joined'))
 
@@ -129,8 +133,7 @@ def discord_callback():
 @app.route('/discord/reset')
 @login_required
 def reset_discord():
-    # discord_user_id = db.get('discord_user_ids:' + cas.username)
-    discord_user_id = fetch_user_discord_account(session['user']['username'])['account_id']
+    discord_user_id = session['user_discord_account']['account_id']
 
     # Attempt to kick member from server and then remove DB records
     try:
@@ -146,6 +149,7 @@ def reset_discord():
 @app.route('/joined')
 @login_required
 def joined():
+    # Hasn't connected yet, redirect to form
     if session['user_discord_account'] is None:
         return redirect('/')
     return render_template('joined.html', rcs_id=cas.username.lower(), user=session['user'], discord_server_id=SERVER_ID)
