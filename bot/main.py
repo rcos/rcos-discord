@@ -18,7 +18,7 @@ async def poll(ctx: Context, title: str, *options):
     if len(options) == 0:
         return await ctx.send_help('poll')
     if len(options) > 9:
-        return await ctx.reply(f'Plase give up to **9** options! You gave {len(options)}.')
+        return await ctx.reply(f'Please give up to **9** options! You gave {len(options)}.')
 
     lines = [f'Poll: **{title}**\n']
     emojis = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣']
