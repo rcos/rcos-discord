@@ -61,7 +61,9 @@ def index():
             'graduation_year': graduation_year,
             'timezone': request.form['timezone']
         }
-        upsert_user(cas.username.lower(), user)
+        
+        # This will either create or update the user
+        session['user'] = upsert_user(cas.username.lower(), user)
 
         app.logger.info(f'Redirecting {cas.username} to Discord OAuth page')
         return redirect(OAUTH_URL)
