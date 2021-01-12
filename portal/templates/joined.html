@@ -17,5 +17,7 @@
 <a href="https://discord.com/channels/{{ discord_server_id }}" class="rpi-button red is-fullwidth"
     style="margin-top: 1rem;">Open Discord</a>
 
-<a href="/discord/reset" class="rpi-button is-fullwidth" style="margin-top: 1rem;">Switch/Reset Discord</a>
+<a href="/discord/reset" class="rpi-button is-fullwidth" style="margin-top: 1rem;"
+    onclick='return confirm("This will kick your currently connected Discord account @{{ discord_member.nick }} from the server.")'>Switch/Reset
+    Discord</a>
 {% endblock %}
