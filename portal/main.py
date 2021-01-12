@@ -4,7 +4,7 @@ import pytz
 import requests
 from dotenv import load_dotenv
 from flask import (Flask, g, redirect, render_template, request, session,
-                   url_for)
+                   url_for, abort)
 from flask_cas import CAS, login_required, logout
 from werkzeug.exceptions import HTTPException
 
@@ -53,7 +53,11 @@ def index():
         # Limit to 20 characters so overall Discord nickname doesn't exceed limit of 32 characters
         first_name = request.form['first_name'].strip()[:20]
         last_name = request.form['last_name'].strip()
-        graduation_year = request.form['graduation_year'].strip()
+        graduation_year = int(request.form['graduation_year'].strip())
+
+        if len(first_name) == 0 or len(last_name) == 0:
+            app.logger.error(f'{cas.username} tried to submit an empty name!')
+            abort(400, description='Invalid names!')
 
         user = {
             'first_name': first_name,
