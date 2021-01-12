@@ -15,6 +15,7 @@ requests = "*"
 gunicorn = "*"
 pytz = "*"
 flask-talisman = "*"
+"discord.py" = "*"
 
 [requires]
 python_version = "3.8"
