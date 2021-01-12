@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask import (Flask, g, flash, redirect, render_template, request, session,
                    url_for, abort)
 from flask_cas import CAS, login_required, logout
+from flask_talisman import Talisman
 from werkzeug.exceptions import HTTPException
 
 from .discord import (OAUTH_URL, SERVER_ID, VERIFIED_ROLE_ID,
@@ -20,6 +21,19 @@ load_dotenv()
 
 app = Flask(__name__)
 cas = CAS(app, '/cas')
+
+csp = {
+    'default-src': [
+        '\'self\'',
+        '\'unsafe-inline\'',
+        'discord.com',
+        '*.discordapp.com',
+        'apexal.github.io',
+        '*.googleapis.com',
+        '*.gstatic.com'
+    ]
+}
+Talisman(app, content_security_policy=csp)
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 app.config['SITE_TITLE'] = 'RCOS Discord'
