@@ -8,12 +8,12 @@ from flask import (Flask, g, redirect, render_template, request, session,
 from flask_cas import CAS, login_required, logout
 from werkzeug.exceptions import HTTPException
 
-from discord import (OAUTH_URL, SERVER_ID, VERIFIED_ROLE_ID,
+from .discord import (OAUTH_URL, SERVER_ID, VERIFIED_ROLE_ID,
                      add_role_to_member, add_user_to_server, get_member,
                      get_tokens, get_user_info, kick_member_from_server,
                      set_member_nickname)
-from rcos import (delete_user_discord_account, fetch_user,
-                  fetch_user_discord_account, upser_user, upsert_user_discord_account)
+from .rcos import (delete_user_discord_account, fetch_user,
+                  fetch_user_discord_account, upsert_user, upsert_user_discord_account)
 
 # Load .env into os.environ
 load_dotenv()
@@ -61,7 +61,7 @@ def index():
             'graduation_year': graduation_year,
             'timezone': request.form['timezone']
         }
-        upser_user(cas.username.lower(), user)
+        upsert_user(cas.username.lower(), user)
 
         app.logger.info(f'Redirecting {cas.username} to Discord OAuth page')
         return redirect(OAUTH_URL)
@@ -152,7 +152,8 @@ def joined():
     # Hasn't connected yet, redirect to form
     if session['user_discord_account'] is None:
         return redirect('/')
-    return render_template('joined.html', rcs_id=cas.username.lower(), user=session['user'], discord_server_id=SERVER_ID)
+    discord_member = get_member(session['user_discord_account']['account_id'])
+    return render_template('joined.html', rcs_id=cas.username.lower(), user=session['user'], discord_member=discord_member, discord_server_id=SERVER_ID)
 
 
 @app.errorhandler(404)

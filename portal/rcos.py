@@ -10,7 +10,7 @@ headers = {
     'api_key': os.environ['RCOS_API_KEY']
 }
 
-def upser_user(username: str, user: Dict) -> Optional[Dict]:
+def upsert_user(username: str, user: Dict) -> Optional[Dict]:
     r = requests.put(f'{api_base_url}/users/{username}', json={
         **user,
         'is_rpi': True,

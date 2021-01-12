@@ -1,11 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1 class="rpi-page-title">Connected as {{ user['first_name'] }} {{ user['last_name'] }}</h1>
+<div class="discord-card">
+    <img class="discord-avatar"
+        src="https://cdn.discordapp.com/avatars/{{ discord_member.user.id }}/{{ discord_member.user.avatar }}.png"
+        alt="{{ discord_member.nick }}'s avatar">
+    <p class="discord-nick">@{{ discord_member.nick }}</p>
+</div>
 <p>You (<strong>{{ rcs_id }}@rpi.edu</strong>) have successfully connected your Discord account
     and have been added to the server.</p>
 <p>
-    This makes it easier for faculty, TAs, and mentors to identify and help students.
-    If you need your server nickname changed at any point, reach out to a Moderator who can change it for you.
+    This makes it easier for Mentors, Coordinators, and Faculty Advisors to identify and help students.
+    If you need your server nickname changed at any point, reach out to a Coordinator or Faculty Advisor who can change
+    it for you.
 </p>
 <a href="https://discord.com/channels/{{ discord_server_id }}" class="rpi-button red is-fullwidth"
     style="margin-top: 1rem;">Open Discord</a>
