@@ -3,7 +3,7 @@ import os
 import pytz
 import requests
 from dotenv import load_dotenv
-from flask import (Flask, g, redirect, render_template, request, session,
+from flask import (Flask, g, flash, redirect, render_template, request, session,
                    url_for, abort)
 from flask_cas import CAS, login_required, logout
 from werkzeug.exceptions import HTTPException
@@ -56,8 +56,13 @@ def index():
         graduation_year = int(request.form['graduation_year'].strip())
 
         if len(first_name) == 0 or len(last_name) == 0:
-            app.logger.error(f'{cas.username} tried to submit an empty name!')
-            abort(400, description='Invalid names!')
+            flash('Nice try... Please enter a name.', category='error')
+            return redirect(url_for('index'))
+
+        if graduation_year > 2038 or graduation_year < 2000:
+            flash('Nice try... Stick to the allowed graduation year range.', category='error')
+            return redirect(url_for('index'))
+
 
         user = {
             'first_name': first_name,

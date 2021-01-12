@@ -41,9 +41,7 @@
         <span class="navbar-brand">{{ config['SITE_TITLE'] }}</span>
     </header>
     <main class="rpi-card">
-        {% if alert %}
-        <div class="rpi-alert">{{ alert }}</div>
-        {% endif %}
+        {% include 'includes/flashes.html' %}
         {% block content %}{% endblock %}
 
         <details>
