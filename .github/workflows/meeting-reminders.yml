@@ -25,4 +25,7 @@ jobs:
         python -m pip install pipenv
         pipenv install
     - name: Run script
+      env:
+        MEETING_WEBHOOK_URL: ${{ secrets.MEETING_WEBHOOK_URL }}
+        RCOS_API_KEY: ${{ secrets.RCOS_API_KEY }}
       run: pipenv run python scripts/meeting_reminders.py
