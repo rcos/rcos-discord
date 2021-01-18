@@ -1,16 +1,13 @@
 import requests
 from requests import HTTPError
 import datetime
+from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
 import os
 
+from api import API_URL, encoded_jwt
+
 load_dotenv()
-
-api_base_url = 'https://rcos-api.herokuapp.com/api/v1'
-
-headers = {
-    'api_key': os.environ['RCOS_API_KEY']
-}
 
 webhook_url = os.environ['MEETING_WEBHOOK_URL']
 
@@ -23,14 +20,13 @@ meeting_type_colors = {
 default_meeting_color = None
 
 def fetch_upcoming_meetings():
-    start = datetime.datetime.now()
-    end = start + datetime.timedelta(minutes=20)
-
-    r = requests.get(f'{api_base_url}/meetings', params={
-        'start_date_time__gte': start,
-        'start_date_time__lte': end
-    }, headers=headers)
-
+    format = '%Y-%m-%dT%H:%M:%S'
+    start = datetime.datetime.now().strftime(format)
+    end = (datetime.datetime.now() + datetime.timedelta(hours=2)).strftime(format)
+    r = requests.get(f'{API_URL}/public_meetings', params=[
+        ('start_date_time', 'gte.' + start),
+        ('start_date_time', 'lte.' + end)
+    ])
     r.raise_for_status()
     upcoming_meetings = r.json()
 
@@ -39,13 +35,15 @@ def fetch_upcoming_meetings():
             print(f'Skipping non-public meeting {meeting["meeting_id"]}: {meeting["title"]}')
             continue
 
-        meeting_start_date_time = datetime.datetime.strptime(meeting['start_date_time'], '%Y-%m-%dT%H:%M:%S')
-        meeting_end_date_time = datetime.datetime.strptime(meeting['end_date_time'], '%Y-%m-%dT%H:%M:%S')
+        meeting_start_date_time = datetime.datetime.strptime(meeting['start_date_time'], format)
+        meeting_end_date_time = datetime.datetime.strptime(meeting['end_date_time'], format)
 
-        meeting_type_display = ' '.join(map(str.capitalize, meeting['meeting_type'].split('_'))) + ' Meeting'
+        meeting_type_display = ' '.join(map(str.capitalize, meeting['type'].split('_'))) + ' Meeting'
         date_str = datetime.datetime.strftime(meeting_start_date_time, '%A, %b %-d, %Y')
 
-        color = meeting_type_colors[meeting['meeting_type']] if meeting['meeting_type'] in meeting_type_colors else default_meeting_color
+        color = meeting_type_colors[meeting['type']] if meeting['type'] in meeting_type_colors else default_meeting_color
+
+        time_until = relativedelta(meeting_start_date_time, datetime.datetime.now())
 
         fields = [
             {
@@ -60,19 +58,25 @@ def fetch_upcoming_meetings():
             },
             {
                 'name': 'Location',
-                'value': meeting['location'],
+                'value': meeting['location'] or 'Not given',
                 'inline': True
             },
             {
                 'name': 'Agenda',
-                'value': '\n'.join(map(lambda s: '- '+s, meeting['agenda'])),
+                'value': '\n'.join(map(lambda s: '- '+s, meeting['agenda'])) if len(meeting['agenda']) else 'Not given',
                 'inline': True
             }
         ]
 
         if meeting['host_username']:
             # Fetch host Discord account
-            hr = requests.get(f'{api_base_url}/users/{meeting["host_username"]}/accounts/discord', headers=headers)
+            hr = requests.get(f'{API_URL}/user_accounts', params={
+                'username': 'eq.' + meeting['host_username'],
+                'type': 'eq.discord'
+            }, headers={
+                'Authorization': 'Bearer ' + encoded_jwt,
+                'Accept': 'application/vnd.pgrst.object+json'
+            })
             try:
                 hr.raise_for_status()
 
@@ -83,17 +87,23 @@ def fetch_upcoming_meetings():
                     'inline': True
                 })
             except HTTPError as err:
+                print(err.response.json())
                 print(f'Failed to fetch host Discord account for {meeting["host_username"]}')
 
         w = requests.post(webhook_url, json={
             'embeds': [{
-                'title': meeting['title'],
-                'description': f'{meeting_type_display} on {date_str}',
+                'title': meeting['title'] or 'Untitled Meeting',
+                'description': f'{meeting_type_display} starting in **{time_until.minutes} minutes**!',
                 'fields': fields,
                 'color': color,
-                'url': f'https://meetings.rcos.io/{meeting["meeting_id"]}'
+                'url': f'https://rcos-meetings.herokuapp.com/meetings/{meeting["meeting_id"]}'
             }]
         })
+
         print(f'{w.status_code} - Sent webhook reminder about {meeting["meeting_id"]} {meeting_type_display}: {meeting["title"]}')
 
-fetch_upcoming_meetings()
+try:
+    fetch_upcoming_meetings()
+except HTTPError as e:
+    print(e)
+    print(e.response.json())

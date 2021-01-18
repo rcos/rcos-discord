@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   schedule:
     # Run workflow every 20 minutes
-    - cron: "*/20 * * * *"
+    - cron: "*/30 * * * *"
 
 jobs:
   send_reminders:
@@ -26,6 +26,7 @@ jobs:
         pipenv install
     - name: Run script
       env:
+        API_URL: ${{ secrets.API_URL }}
+        POSTGREST_JWT_SECRET: ${{ secrets.POSTGREST_JWT_SECRET }} 
         MEETING_WEBHOOK_URL: ${{ secrets.MEETING_WEBHOOK_URL }}
-        RCOS_API_KEY: ${{ secrets.RCOS_API_KEY }}
-      run: pipenv run python scripts/meeting_reminders.py
+      run: pipenv run python -m scripts.meeting_reminders

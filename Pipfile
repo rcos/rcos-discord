@@ -17,6 +17,7 @@ pytz = "*"
 flask-talisman = "*"
 "discord.py" = "*"
 pyjwt = "*"
+python-dateutil = "*"
 
 [requires]
 python_version = "3.8"
