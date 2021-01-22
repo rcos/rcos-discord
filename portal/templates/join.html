@@ -19,11 +19,11 @@
             placeholder="Your family name" required>
     </div>
 
-    {% if is_logged_in %}
+    {% if is_student %}
     <div class="field">
-        <label class="rpi-label" for="grad-year">Graduation Year</label>
-        <input class="rpi-input" value="{{ user['graduation_year'] }}" type="number" name="graduation_year"
-            id="grad-year" min="2000" max="2038" placeholder="What year will you graduate?" required>
+        <label class="rpi-label" for="grad-year">Graduation Year (leave blank if not student)</label>
+        <input class="rpi-input" value="{% if user['cohort'] %}{{ user['cohort'] + 4 }}{% endif %}" type="number" name="graduation_year"
+            id="grad-year" min="2000" max="2038" placeholder="What year will you graduate?">
     </div>
     {% endif %}
     
