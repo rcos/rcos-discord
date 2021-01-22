@@ -36,9 +36,9 @@ csp = {
 Talisman(app, content_security_policy=csp)
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
-app.config['SITE_TITLE'] = 'RCOS Discord'
+app.config['SITE_TITLE'] = os.environ.get('SITE_TITLE')
 app.config['CAS_SERVER'] = 'https://cas-auth.rpi.edu/cas'
-app.config['CAS_AFTER_LOGIN'] = 'index'
+app.config['CAS_AFTER_LOGIN'] = 'join'
 
 @app.before_request
 def before_request():
@@ -52,9 +52,13 @@ def before_request():
     if ('user_discord_account' not in session or session['user_discord_account'] is None) and cas.username:
         session['user_discord_account'] = fetch_user_discord_account(cas.username.lower())
 
-@app.route('/', methods=['GET', 'POST'])
-@login_required
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+
+@app.route('/join', methods=['GET', 'POST'])
+def join():
     if request.method == 'GET':
         app.logger.info(f'Home page requested by {cas.username}')
 
