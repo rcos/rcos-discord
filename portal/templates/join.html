@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1 class="rpi-page-title">Join Server</h1>
-<p class="rpi-h2">You are logged in as <strong>{{ rcs_id }}@rpi.edu</strong> <a href="/cas/logout">(Logout)</a></p>
+{% if is_logged_in %}
+<p class="rpi-h2">You are logged in as <strong>{{ username }}@rpi.edu</strong> <a href="/cas/logout">(Logout)</a></p>
+{% else %}
+<p class="rpi-h2">You are joining the server as an external (non-RPI) user. If you are a student/faculty please <a href="/cas/login">Login with CAS</a>.</p>
+{% endif %}
 <form method="POST" style="margin-top: 2rem;">
     <div class="field">
         <label class="rpi-label" for="first-name">First Name</label>
@@ -15,12 +19,13 @@
             placeholder="Your family name" required>
     </div>
 
+    {% if is_logged_in %}
     <div class="field">
         <label class="rpi-label" for="grad-year">Graduation Year</label>
         <input class="rpi-input" value="{{ user['graduation_year'] }}" type="number" name="graduation_year"
             id="grad-year" min="2000" max="2038" placeholder="What year will you graduate?" required>
     </div>
-
+    
     <div class="field">
         <label class="rpi-label" for="timezone">Timezone</label>
         <select name="timezone" id="timezone" class="rpi-input" required>
@@ -30,6 +35,7 @@
             {% endfor %}
         </select>
     </div>
+    {% endif %}
 
     <p>
         By connecting your account, you agree with <a href="https://discord.com/privacy" target="_blank">Discord's

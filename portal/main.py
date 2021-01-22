@@ -59,14 +59,21 @@ def index():
 
 @app.route('/join', methods=['GET', 'POST'])
 def join():
+    is_logged_in = cas.username is not None
+    username = cas.username.lower() if is_logged_in else None
+    user = session['user'] if is_logged_in else None
+    
     if request.method == 'GET':
-        app.logger.info(f'Home page requested by {cas.username}')
+        if is_logged_in:
+            app.logger.info(f'Home page requested by RPI user {cas.username}')
+        else:
+            app.logger.info(f'Home page requested by external user')
 
         # Already connected to Discord!
         if session['user_discord_account']:
             return redirect(url_for('joined'))
 
-        return render_template('join.html', user=session['user'], rcs_id=cas.username.lower(), timezones=pytz.all_timezones)
+        return render_template('join.html', is_logged_in=is_logged_in, user=user, username=username, timezones=pytz.all_timezones)
     elif request.method == 'POST':
         # Limit to 20 characters so overall Discord nickname doesn't exceed limit of 32 characters
         first_name = request.form['first_name'].strip()[:20]
