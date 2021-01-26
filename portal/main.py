@@ -7,6 +7,7 @@ from flask import (Flask, abort, flash, g, redirect, render_template, request,
                    session, url_for)
 from flask_cas import CAS, login_required, logout
 from flask_talisman import Talisman
+from requests.models import HTTPError
 from werkzeug.exceptions import HTTPException
 
 from .discord import (OAUTH_URL, SERVER_ID, VERIFIED_ROLE_ID,
@@ -198,7 +199,16 @@ def joined():
     # Hasn't connected yet, redirect to form
     if session['user_discord_account'] is None:
         return redirect('/')
-    discord_member = get_member(session['user_discord_account']['account_id'])
+    try:
+        discord_member = get_member(session['user_discord_account']['account_id'])
+    except HTTPError as err:
+        if err.response.status_code == 404:
+            # User disconnected Discord through a different means than this website... REMOVE THEIR RECORD
+            delete_user_discord_account(session['user']['username'])
+            session['user_discord_account'] = None
+            return redirect(url_for('join'))
+        raise err
+
     return render_template('joined.html', rcs_id=cas.username.lower(), user=session['user'], discord_member=discord_member, discord_server_id=SERVER_ID)
 
 
